@@ -119,8 +119,11 @@ func servePath(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// only work with relative paths
 	file = strings.TrimPrefix(file, "../")
 	file = strings.TrimPrefix(file, "/")
+	file = strings.TrimPrefix(file, "./")
+	file = strings.TrimPrefix(file, "~/")
 
 	if directory != "." && !strings.HasPrefix(file, directory) {
 		w.WriteHeader(http.StatusUnauthorized)
