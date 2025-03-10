@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 /*
@@ -40,6 +41,7 @@ var htmlHeader = "<!doctype html>\n<meta name=\"viewport\" content=\"width=devic
 var notFoundError = htmlHeader + "<pre>File Not Found</pre>"
 
 func scanFolder(startdir string) string {
+
 	fileSystem := os.DirFS(startdir)
 	html := htmlHeader + "<pre>"
 
@@ -114,6 +116,15 @@ func servePath(w http.ResponseWriter, r *http.Request) {
 	if file == "" {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte(notFoundError))
+		return
+	}
+
+	file = strings.TrimPrefix(file, "../")
+	file = strings.TrimPrefix(file, "/")
+
+	if directory != "." && !strings.HasPrefix(file, directory) {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("can only serve files in the specified path"))
 		return
 	}
 
